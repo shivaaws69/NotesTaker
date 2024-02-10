@@ -10,7 +10,7 @@ RUN apk update && \
     python3 \
     python3-dev \
     py-pip \
-    pyaudio
+    libsndfile-dev
 
 # Set working directory for the application
 WORKDIR /app
