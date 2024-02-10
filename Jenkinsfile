@@ -15,7 +15,7 @@ pipeline{
         }
         stage('Checkout from Git'){
             steps{
-                git branch: 'master', url: 'https://github.com/rameshkumarvermagithub/NotesTaker.git'
+                git branch: 'main', url: 'https://github.com/rameshkumarvermagithub/NotesTaker.git'
             }
         }
         stage("Sonarqube Analysis "){
