@@ -1,5 +1,5 @@
-# Use the official Node.js 16 Alpine image
-FROM node:16-alpine
+# Use the official Node.js 18 Alpine image
+FROM node:18-alpine
 
 # Install necessary build tools and dependencies
 RUN apk update && \
