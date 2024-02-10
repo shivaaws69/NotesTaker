@@ -30,6 +30,8 @@ WORKDIR /app/backend
 COPY backend/requirements.txt ./
 
 # Install backend dependencies
+RUN pip install --upgrade pip setuptools
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the backend source code
