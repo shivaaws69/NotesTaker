@@ -1,13 +1,6 @@
 # Use the official lightweight Node.js 16 image for frontend
 FROM node:16-alpine AS frontend
 
-# Install necessary build dependencies for pyaudio
-RUN apk update && apk add --no-cache \
-    gcc \
-    libasound-dev \
-    portaudio19-dev \
-    python3-dev
-
 # Set the working directory in the container for frontend
 WORKDIR /app/frontend
 
@@ -49,13 +42,20 @@ EXPOSE 8000
 ENTRYPOINT ["python", "app.py"]
 
 # Use a multi-stage build to reduce final image size
-FROM node:16-alpine
+FROM node:16-alpine AS final
 
 # Set environment variables
 ENV NODE_ENV production
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Install necessary packages for building pyaudio
+RUN apk update && apk add --no-cache \
+    build-base \
+    alsa-lib-dev \
+    portaudio-dev \
+    python3-dev
 
 # Copy the built frontend from the previous stage
 COPY --from=frontend /app/frontend/public ./frontend/public
