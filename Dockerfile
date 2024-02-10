@@ -10,8 +10,8 @@ RUN apk update && \
     python3 \
     python3-dev \
     py-pip \
-    py-audio \
-    libsndfile-dev
+    libsndfile-dev \
+    && pip install --no-cache-dir pyaudio
 
 # Set working directory for the application
 WORKDIR /app
