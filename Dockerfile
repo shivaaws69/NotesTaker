@@ -1,41 +1,63 @@
-# Use the official Node.js 16 Alpine image as a base
-FROM node:18-alpine
+# Use the official lightweight Node.js 16 image
+FROM node:16-alpine AS frontend
 
-# Install necessary build tools and dependencies
-RUN apk update && \
-    apk add --no-cache \
-    build-base \
-    alsa-lib-dev \
-    portaudio-dev \
-    python3 \
-    python3-dev \
-    py-pip \
-    libsndfile-dev \
-    && pip install --no-cache-dir pyaudio
+# Set the working directory in the container
+WORKDIR /app/frontend
 
-# Set working directory for the application
-WORKDIR /app
-
-# Copy package.json and yarn.lock for the frontend
-COPY frontend/package*.json ./frontend/
-COPY backend/requirements.txt ./backend/
+# Copy the frontend package.json and yarn.lock files
+COPY frontend/package*.json ./
 
 # Install frontend dependencies
-RUN cd frontend && \
-    yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile
 
-# Install backend dependencies within a virtual environment
-RUN python3 -m venv /venv && \
-    /venv/bin/pip install --no-cache-dir -r backend/requirements.txt
+# Copy the frontend source code
+COPY frontend .
 
-# Activate virtual environment
-ENV PATH="/venv/bin:$PATH"
+# Build the frontend
+RUN yarn build
 
-# Copy the rest of the application
-COPY . .
+# Use the official Python 3 image
+FROM python:3.9-slim AS backend
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set the working directory in the container
+WORKDIR /app/backend
+
+# Copy the backend requirements file
+COPY backend/requirements.txt ./
+
+# Install backend dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the backend source code
+COPY backend .
+
+# Expose port 8000 to allow communication to/from server
+EXPOSE 8000
+
+# Set the entrypoint to run the backend server
+ENTRYPOINT ["python", "app.py"]
+
+# Use a multi-stage build to reduce final image size
+FROM node:16-alpine
+
+# Set environment variables
+ENV NODE_ENV production
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the built frontend from the previous stage
+COPY --from=frontend /app/frontend/public ./frontend/public
+
+# Copy the built backend from the previous stage
+COPY --from=backend /app/backend .
 
 # Expose port 3000 for the frontend
 EXPOSE 3000
 
-# Command to start the application
-CMD ["node", "backend/server.js"]
+# Run the frontend
+CMD ["yarn", "start"]
