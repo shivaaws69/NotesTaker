@@ -1,5 +1,5 @@
-# Use the official Node.js 18 Alpine image
-FROM node:18-alpine
+# Use the official Node.js 16 Alpine image
+FROM node:16-alpine
 
 # Install necessary build tools and dependencies
 RUN apk update && \
@@ -10,6 +10,7 @@ RUN apk update && \
     python3 \
     python3-dev \
     py-pip \
+    py-audio \
     libsndfile-dev
 
 # Set working directory for the application
@@ -23,8 +24,12 @@ COPY backend/requirements.txt ./backend/
 RUN cd frontend && \
     yarn install --frozen-lockfile
 
-# Install backend dependencies
-RUN pip install --no-cache-dir -r backend/requirements.txt
+# Install backend dependencies within a virtual environment
+RUN python3 -m venv /venv && \
+    /venv/bin/pip install --no-cache-dir -r backend/requirements.txt
+
+# Activate virtual environment
+ENV PATH="/venv/bin:$PATH"
 
 # Copy the rest of the application
 COPY . .
