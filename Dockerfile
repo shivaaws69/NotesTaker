@@ -21,5 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code into the container at /app
 COPY . /app
 
+# Expose port 3000 for the frontend
+EXPOSE 3000
+
 # Specify the command to run on container start
 CMD [ "python", "app.py" ]
