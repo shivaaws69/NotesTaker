@@ -1,4 +1,4 @@
-# Use the official Node.js 18 Alpine image
+# Use the official Node.js 16 Alpine image as a base
 FROM node:18-alpine
 
 # Install necessary build tools and dependencies
