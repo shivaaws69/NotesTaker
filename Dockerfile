@@ -10,7 +10,15 @@ RUN npm run build
 FROM python:latest AS backend
 WORKDIR /app/backend
 COPY backend/requirements.txt ./
+
+# Install system-level dependencies for pyaudio
+RUN apt-get update && apt-get install -y \
+    portaudio19-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+
 COPY backend/ .
 
 # Create a multi-stage build to optimize the final image size
