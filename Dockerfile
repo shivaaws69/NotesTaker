@@ -1,38 +1,24 @@
-# Use Node.js LTS version as base image for the frontend
-FROM node:lts AS frontend
+# Start from the base Python 3.9 slim image
+FROM docker.io/library/python:3.9-slim@sha256:bcdcaefe092335ff0a0ed421e8a8d12b86fc2c1feb1199fbdac27d67ba808a9c
 
-# Set working directory for frontend
-WORKDIR /app/frontend
+# Update package lists and install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libasound-dev \
+    portaudio19-dev \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy frontend source code
-COPY frontend/package.json frontend/yarn.lock ./
+# Set the working directory inside the container
+WORKDIR /app
 
-# Install dependencies
-RUN yarn install
+# Copy the requirements file into the container at /app/
+COPY backend/requirements.txt /app/
 
-# Copy the rest of the frontend source code
-COPY frontend .
-
-# Build frontend
-RUN yarn build
-
-# Use Python 3.9 as base image for the backend
-FROM python:3.9-slim AS backend
-
-# Set working directory for backend
-WORKDIR /app/backend
-
-# Copy backend source code
-COPY backend/requirements.txt ./
-
-# Install pip packages
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the backend source code
-COPY backend .
+# Copy the current directory contents into the container at /app/
+COPY . /app
 
-# Expose port 3000 for the frontend
-EXPOSE 3000
-
-# Start the backend server
-CMD ["python", "app.py"]
+# The image will be exported and named as "notestaker" in the Docker repository
