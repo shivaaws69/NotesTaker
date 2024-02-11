@@ -1,9 +1,9 @@
 pipeline{
     agent any
-    // tools{
-    //     jdk 'jdk17'
-    //     nodejs 'node16'
-    // }
+    tools{
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
     }
@@ -72,25 +72,25 @@ pipeline{
                 sh "docker run -d --name notestaker -p 3000:3000 -p 8000:8000 rameshkumarverma/notestaker:latest"
             }
         }
-      // stage('Deploy to Kubernetes') {
-      //       steps {
-      //           script {
-      //               // dir('K8S') {
-      //                   withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
-      //                       // Apply deployment and service YAML files
-      //                       sh 'kubectl apply -f deployment.yml'
-      //                       sh 'kubectl apply -f service.yml'
+      stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    // dir('K8S') {
+                        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8s', namespace: '', restrictKubeConfigAccess: false, serverUrl: '') {
+                            // Apply deployment and service YAML files
+                            sh 'kubectl apply -f deployment.yml'
+                            sh 'kubectl apply -f service.yml'
 
-      //                       // Get the external IP or hostname of the service
-      //                       // def externalIP = sh(script: 'kubectl get svc amazon-service -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"', returnStdout: true).trim()
+                            // Get the external IP or hostname of the service
+                            // def externalIP = sh(script: 'kubectl get svc amazon-service -o jsonpath="{.status.loadBalancer.ingress[0].hostname}"', returnStdout: true).trim()
 
-      //                       // Print the URL in the Jenkins build log
-      //                       // echo "Service URL: http://${externalIP}/"
-      //                   }
-      //               // }
-      //           }
-      //       }
-      //   }
+                            // Print the URL in the Jenkins build log
+                            // echo "Service URL: http://${externalIP}/"
+                        }
+                    // }
+                }
+            }
+        }
 
     }
 }
