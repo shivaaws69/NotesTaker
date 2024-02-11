@@ -5,6 +5,8 @@ COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
 RUN npm run build
+# Ensure that the build output is moved to a directory named "out"
+RUN mv /app/frontend/.next /app/frontend/out
 
 # Use the official Python image as a base image for the backend
 FROM python:latest AS backend
