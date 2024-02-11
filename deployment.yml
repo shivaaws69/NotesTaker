@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notestaker-deployment
+  labels:
+    app: notestaker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notestaker
+  template:
+    metadata:
+      labels:
+        app: notestaker
+    spec:
+      containers:
+      - name: notestaker
+        image: rameshkumarverma/notestaker:latest
+        ports:
+        - containerPort: 3000
+        - containerPort: 8000
