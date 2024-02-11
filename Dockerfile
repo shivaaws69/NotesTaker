@@ -7,17 +7,18 @@ RUN apt-get update && apt-get install -y \
     libasound-dev \
     portaudio19-dev \
     python3-dev \
+    curl \
+    gnupg \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js and yarn
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    npm install -g yarn
 
 # Set the working directory inside the container
 WORKDIR /app
-
-# Install Node.js and yarn
-RUN apt-get update && apt-get install -y \
-    curl \
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g yarn
 
 # Copy the requirements file into the container at /app/
 COPY backend/requirements.txt /app/
