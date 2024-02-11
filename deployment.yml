@@ -20,3 +20,16 @@ spec:
         ports:
         - containerPort: 3000
         - containerPort: 8000
+        # Add liveness and readiness probes
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
