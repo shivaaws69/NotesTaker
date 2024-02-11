@@ -1,63 +1,38 @@
-# Use the official lightweight Node.js 16 image
-FROM node:16-alpine AS frontend
+# Use Node.js LTS version as base image for the frontend
+FROM node:lts AS frontend
 
-# Set the working directory in the container
+# Set working directory for frontend
 WORKDIR /app/frontend
 
-# Copy the frontend package.json and yarn.lock files
-COPY frontend/package*.json ./
+# Copy frontend source code
+COPY frontend/package.json frontend/yarn.lock ./
 
-# Install frontend dependencies
-RUN yarn install --frozen-lockfile
+# Install dependencies
+RUN yarn install
 
-# Copy the frontend source code
+# Copy the rest of the frontend source code
 COPY frontend .
 
-# Build the frontend
+# Build frontend
 RUN yarn build
 
-# Use the official Python 3 image
+# Use Python 3.9 as base image for the backend
 FROM python:3.9-slim AS backend
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Set the working directory in the container
+# Set working directory for backend
 WORKDIR /app/backend
 
-# Copy the backend requirements file
+# Copy backend source code
 COPY backend/requirements.txt ./
 
-# Install backend dependencies
+# Install pip packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the backend source code
+# Copy the rest of the backend source code
 COPY backend .
-
-# Expose port 8000 to allow communication to/from server
-EXPOSE 8000
-
-# Set the entrypoint to run the backend server
-ENTRYPOINT ["python", "app.py"]
-
-# Use a multi-stage build to reduce final image size
-FROM node:16-alpine
-
-# Set environment variables
-ENV NODE_ENV production
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the built frontend from the previous stage
-COPY --from=frontend /app/frontend/public ./frontend/public
-
-# Copy the built backend from the previous stage
-COPY --from=backend /app/backend .
 
 # Expose port 3000 for the frontend
 EXPOSE 3000
 
-# Run the frontend
-CMD ["yarn", "start"]
+# Start the backend server
+CMD ["python", "app.py"]
