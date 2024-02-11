@@ -1,5 +1,5 @@
-# Use the official Node.js image as a base image for the frontend
-FROM node:latest AS frontend
+# Use the official Node.js image as a base image for the frontend build
+FROM node:latest AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm install
@@ -24,7 +24,9 @@ COPY backend/ .
 # Create a multi-stage build to optimize the final image size
 FROM node:alpine
 WORKDIR /app
-COPY --from=frontend /app/frontend/out /app/frontend/out
+
+# Copy built frontend assets
+COPY --from=frontend-builder /app/frontend/out /app/frontend/out
 COPY --from=backend /app/backend /app/backend
 COPY start.sh /app/start.sh
 RUN chmod +x /app/start.sh
